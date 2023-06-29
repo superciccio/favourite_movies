@@ -1,4 +1,4 @@
-# Getting Started
+# Favoruite movies :)
 
 ### Stack used
 
