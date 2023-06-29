@@ -1,0 +1,19 @@
+{
+  "_embedded": {
+    "movies": [
+      {
+        "movieId": 1,
+        "title": "Harry potter 1",
+        "genre": "Fantasy",
+        "generes": [
+          "Fantasy"
+        ],
+        "_links": {
+          "self": {
+            "href": "http://localhost/movies/removeAsFavourite/3"
+          }
+        }
+      }
+    ]
+  }
+}

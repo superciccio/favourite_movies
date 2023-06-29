@@ -1,0 +1,22 @@
+{
+  "movieId": 1,
+  "title": "Harry potter 1",
+  "genre": "Fantasy",
+  "generes": [
+    "Fantasy"
+  ],
+  "_links": {
+    "filterByGenre": {
+      "href": "http://localhost/movies/filter/Fantasy"
+    },
+    "byId": {
+      "href": "http://localhost/movies/1"
+    },
+    "as_favourite": {
+      "href": "http://localhost/movies/asFavourite/1"
+    },
+    "remove_from_favourites": {
+      "href": "http://localhost/movies/removeAsFavourite/1"
+    }
+  }
+}
