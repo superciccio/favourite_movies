@@ -10,7 +10,7 @@
         ],
         "_links": {
           "self": {
-            "href": "http://localhost/movies/removeAsFavourite/3"
+            "href": "http://localhost/movies/removeAsFavourite/1"
           }
         }
       }
