@@ -1,11 +1,11 @@
 package com.bttndr.favourite_movies.controller;
 
-import com.bttndr.favourite_movies.entity.FavouriteMovie;
 import com.bttndr.favourite_movies.entity.Movie;
 import com.bttndr.favourite_movies.service.FavouriteMovieService;
 import com.bttndr.favourite_movies.service.MovieService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -48,10 +48,10 @@ public class MovieController {
         return EntityModel.of(favouriteModelAssembler.toCollectionModel(favouriteMovies));
     }
 
-    @PostMapping("/removeAsFavourite/{movieId}")
-    public EntityModel<Optional<FavouriteMovie>> unMarkAsFavourite(@PathVariable("movieId") String movieId) {
-        this.favouriteMovieService.unMarkAsFavourite(new Long[]{Long.valueOf(movieId)},usernameCurrentUser());
-        return EntityModel.of(this.favouriteMovieService.findByMovieId(movieId, usernameCurrentUser()));
+    @DeleteMapping("/removeAsFavourite/{movieId}")
+    public ResponseEntity unMarkAsFavourite(@PathVariable("movieId") String movieId) {
+        this.favouriteMovieService.unMarkAsFavourite(new Long[]{Long.valueOf(movieId)}, usernameCurrentUser());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/favourites")
