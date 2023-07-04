@@ -25,6 +25,8 @@ public class UserConfiguration implements WebMvcConfigurer {
                 .formLogin()
                 .and()
                 .csrf().disable();
+        // this makes the h2-console work
+        http.headers().frameOptions().disable();
         return http.build();
     }
 

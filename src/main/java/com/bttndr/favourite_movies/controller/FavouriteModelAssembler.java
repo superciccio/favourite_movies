@@ -32,6 +32,6 @@ public class FavouriteModelAssembler implements RepresentationModelAssembler<Fav
             EntityModel<Movie> movieEntityModel = toModel(entity);
             transformed.add(movieEntityModel);
         }
-            return CollectionModel.of(transformed);
+        return CollectionModel.of(transformed);
     }
 }

@@ -18,6 +18,8 @@ movies can be also filtered by genre
 ### I want to see it in action.
 
 `build and start the application` use the file `scripts/app_interaction.sh` to see in action
+or
+run `AppIntegrationTest` under test
 
 ### What does this sample have ?
 
@@ -37,8 +39,8 @@ rest controller based on `https://spring.io/projects/spring-hateoas`
 
 * docker or any non in memory database
 * currently, there is a very basic auth and CSRF protection (is disabled)
-* there is only configuration for using h2
-* integration test
+* there is only configuration for using h2 -> console is enabled
+* integration test -> there is one added on 4 Jul
 * not optimized
 * swagger
 * validation

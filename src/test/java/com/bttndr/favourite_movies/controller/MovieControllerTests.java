@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -77,7 +79,15 @@ class MovieControllerTests {
 
         given(movieService.getAll()).willReturn(Arrays.asList(movie1, movie2));
 
-        mvc.perform(get("/movies/")).andExpect(content().json(getResourceFileAsString(LIST_OF_MOVIE_JSON)));
+        mvc.perform(get("/movies/"))
+                .andExpect(content().json(getResourceFileAsString(LIST_OF_MOVIE_JSON)))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("$._embedded.movies").isArray())
+                .andExpect(jsonPath("$._embedded.movies[0]._links").isMap())
+                .andExpect(jsonPath("$._embedded.movies[0]._links.filterByGenre").exists())
+                .andExpect(jsonPath("$._embedded.movies[0]._links.byId").exists())
+                .andExpect(jsonPath("$._embedded.movies[0]._links.as_favourite").exists())
+                .andExpect(jsonPath("$._embedded.movies[0]._links.remove_from_favourites").exists());
     }
 
     @Test
@@ -96,7 +106,8 @@ class MovieControllerTests {
 
         given(movieService.getByGenre(new String[]{"Fantasy"})).willReturn(Collections.singletonList(movie1));
 
-        mvc.perform(get("/movies/filter/Fantasy")).andExpect(content().json(getResourceFileAsString("filtered_list.json")));
+        mvc.perform(get("/movies/filter/Fantasy"))
+                .andExpect(content().json(getResourceFileAsString("filtered_list.json")));
     }
 
 
@@ -130,7 +141,8 @@ class MovieControllerTests {
         given(favouriteMovieService.markMovie(new Long[]{1L}, "user1")).willReturn(List.of(fv));
 
 
-        mvc.perform(post("/movies/asFavourite/1")).andExpect(content().json(getResourceFileAsString("fav_movie.json")));
+        mvc.perform(post("/movies/asFavourite/1"))
+                .andExpect(content().json(getResourceFileAsString("fav_movie.json")));
     }
 
     @Test
@@ -150,7 +162,7 @@ class MovieControllerTests {
 
        when(favouriteMovieService.findByMovieId(movie1.getMovieId().toString(), "user1")).thenReturn(Optional.empty());
 
-        mvc.perform(post("/movies/removeAsFavourite/1")).andExpect(content().json("{}"));
+        mvc.perform(delete("/movies/removeAsFavourite/1"));
     }
 
 
