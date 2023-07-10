@@ -26,17 +26,17 @@ public class AppIntegrationTest {
     void given_an_authenticated_user_perform_end_to_end_journey() throws Exception {
 
         // returns a list of movies
-        ResultActions movies = mvc.perform(get("/movies/"));
+        ResultActions movies = mvc.perform(get("/api/movies/"));
         movies.andExpect(status().is(200));
         movies.andExpect(jsonPath("$._embedded.movies").isArray());
 
         // no favourites already saved
-        ResultActions favMovies = mvc.perform(get("/movies/favourites"));
+        ResultActions favMovies = mvc.perform(get("/api/movies/favourites"));
         favMovies.andExpect(status().is(200));
         favMovies.andExpect(content().string("{ }"));
 
 
-        ResultActions favMovie = mvc.perform(post("/movies/asFavourite/2"));
+        ResultActions favMovie = mvc.perform(post("/api/movies/asFavourite/2"));
         favMovie.andExpect(status().is(200));
         favMovie.andExpect(jsonPath("$._embedded.movies").isArray());
         favMovie.andExpect(jsonPath("$._embedded.movies[0].title").exists());
@@ -45,15 +45,15 @@ public class AppIntegrationTest {
         favMovie.andExpect(jsonPath("$._embedded.movies[0]._links").isMap());
 
         // no favourites already saved
-        favMovies = mvc.perform(get("/movies/favourites"));
+        favMovies = mvc.perform(get("/api/movies/favourites"));
         favMovies.andExpect(status().is(200));
         favMovie.andExpect(jsonPath("$._embedded.movies").isArray());
 
         // remove from favourite list
-        ResultActions removeFavouriteMovie = mvc.perform(delete("/movies/removeAsFavourite/2"));
+        ResultActions removeFavouriteMovie = mvc.perform(delete("/api/movies/removeAsFavourite/2"));
         removeFavouriteMovie.andExpect(status().is(204));
 
-        favMovies = mvc.perform(get("/movies/favourites"));
+        favMovies = mvc.perform(get("/api/movies/favourites"));
         favMovies.andExpect(status().is(200));
         favMovies.andExpect(content().string("{ }"));
     }

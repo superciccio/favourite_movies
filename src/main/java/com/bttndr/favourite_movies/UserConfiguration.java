@@ -2,32 +2,38 @@ package com.bttndr.favourite_movies;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
-public class UserConfiguration implements WebMvcConfigurer {
+public class UserConfiguration  {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .and()
-                .csrf().disable();
-        // this makes the h2-console work
-        http.headers().frameOptions().disable();
-        return http.build();
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/api/movies/**").authenticated()
+                        .anyRequest().permitAll()
+                )
+                .requestCache((requestCache) -> requestCache
+                        .requestCache(new NullRequestCache())
+                )
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement((sessionManagement) -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
+                .build();
     }
 
     @Bean
