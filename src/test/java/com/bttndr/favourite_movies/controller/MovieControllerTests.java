@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -29,9 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.mockito.BDDMockito.given;
-
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MovieController.class)
@@ -51,15 +49,14 @@ class MovieControllerTests {
     private FavouriteMovieService favouriteMovieService;
 
     @Test
-    public void user_not_logged() throws Exception {
-        mvc.perform(get("/")).andExpect(status().is(302));
+    public void user_not_authorized() throws Exception {
+        mvc.perform(get("/api/")).andExpect(status().is(401));
     }
 
     @Test
+    @WithMockUser
     public void user_logged() throws Exception {
-        mvc.perform(get("/login")
-                .param("username", "user1")
-                .param("password", "user1"))
+        mvc.perform(get("/api/movies/"))
                 .andExpect(status().is(200));
     }
 
@@ -77,9 +74,9 @@ class MovieControllerTests {
         movie2.setTitle("The Wale");
 
 
-        given(movieService.getAll()).willReturn(Arrays.asList(movie1, movie2));
+        when(movieService.getAll()).thenReturn(Arrays.asList(movie1, movie2));
 
-        mvc.perform(get("/movies/"))
+        mvc.perform(get("/api/movies/"))
                 .andExpect(content().json(getResourceFileAsString(LIST_OF_MOVIE_JSON)))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
                 .andExpect(jsonPath("$._embedded.movies").isArray())
@@ -104,9 +101,9 @@ class MovieControllerTests {
         movie2.setTitle("The Wale");
 
 
-        given(movieService.getByGenre(new String[]{"Fantasy"})).willReturn(Collections.singletonList(movie1));
+        when(movieService.getByGenre(new String[]{"Fantasy"})).thenReturn(Collections.singletonList(movie1));
 
-        mvc.perform(get("/movies/filter/Fantasy"))
+        mvc.perform(get("/api/movies/filter/Fantasy"))
                 .andExpect(content().json(getResourceFileAsString("filtered_list.json")));
     }
 
@@ -120,14 +117,14 @@ class MovieControllerTests {
         movie1.setTitle("Harry potter 1");
 
 
-        given(movieService.findById(1L)).willReturn(java.util.Optional.of(movie1));
+        when(movieService.findById(1L)).thenReturn(java.util.Optional.of(movie1));
 
-        mvc.perform(get("/movies/1")).andExpect(content().json(getResourceFileAsString(SINGLE_MOVIE_JSON)));
+        mvc.perform(get("/api/movies/1")).andExpect(content().json(getResourceFileAsString(SINGLE_MOVIE_JSON)));
     }
 
     @Test
-    @WithMockUser(username = "user1")
-    public void mark_a_movie_as_favourite() throws Exception {
+    @WithMockUser //user is the default username
+    public void mark_unmark_a_movie_as_favourite() throws Exception {
         Movie movie1 = new Movie();
         movie1.setMovieId(1L);
         movie1.setGenre("Fantasy");
@@ -135,34 +132,19 @@ class MovieControllerTests {
 
         FavouriteMovie fv = new FavouriteMovie();
         fv.setMovie(movie1);
-        fv.setUsername("user1");
+        fv.setUsername("user");
         fv.setFavMovieId(1L);
 
-        given(favouriteMovieService.markMovie(new Long[]{1L}, "user1")).willReturn(List.of(fv));
+        when(favouriteMovieService.markMovie(new Long[]{1L}, "user")).thenReturn(List.of(fv));
 
-
-        mvc.perform(post("/movies/asFavourite/1"))
+        mvc.perform(post("/api/movies/asFavourite/1").with(csrf()))
                 .andExpect(content().json(getResourceFileAsString("fav_movie.json")));
-    }
 
-    @Test
-    @WithMockUser(username = "user1")
-    public void unmark_a_movie_from_favourite() throws Exception {
-        Movie movie1 = new Movie();
-        movie1.setMovieId(1L);
-        movie1.setGenre("Fantasy");
-        movie1.setTitle("Harry potter 1");
+        doNothing().when(favouriteMovieService).unMarkAsFavourite(new Long[]{1L}, "user");
 
-        FavouriteMovie fv = new FavouriteMovie();
-        fv.setMovie(movie1);
-        fv.setUsername("user1");
-        fv.setFavMovieId(1L);
+        when(favouriteMovieService.findByMovieId(movie1.getMovieId().toString(), "user")).thenReturn(Optional.empty());
 
-       doNothing().when(favouriteMovieService).unMarkAsFavourite(new Long[]{1L}, "user1");
-
-       when(favouriteMovieService.findByMovieId(movie1.getMovieId().toString(), "user1")).thenReturn(Optional.empty());
-
-        mvc.perform(delete("/movies/removeAsFavourite/1"));
+        mvc.perform(delete("/api/movies/removeAsFavourite/1"));
     }
 
 

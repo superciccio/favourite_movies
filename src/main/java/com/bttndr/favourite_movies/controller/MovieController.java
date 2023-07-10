@@ -15,7 +15,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/movies")
+@RequestMapping("/api/movies")
 public class MovieController {
 
     private final MovieService movieService;
@@ -49,7 +49,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/removeAsFavourite/{movieId}")
-    public ResponseEntity unMarkAsFavourite(@PathVariable("movieId") String movieId) {
+    public ResponseEntity<Void> unMarkAsFavourite(@PathVariable("movieId") String movieId) {
         this.favouriteMovieService.unMarkAsFavourite(new Long[]{Long.valueOf(movieId)}, usernameCurrentUser());
         return ResponseEntity.noContent().build();
     }

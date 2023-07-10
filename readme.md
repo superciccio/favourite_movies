@@ -28,7 +28,8 @@ in test/resources/ there are examples of response (*.json)
 
 this sample contains basic auth, via username & password. the 2 users that exists are
 `user1` and `user2` (password same as username)
-junit to cover auth, is included.
+junit to cover auth, is included,
+basic auth `/api/movies` to access data.
 
 spring-boot:build-image builds (a docker image)
 
@@ -38,7 +39,8 @@ rest controller based on `https://spring.io/projects/spring-hateoas`
 ### What does this sample DOES NOT have ?
 
 * docker or any non in memory database
-* currently, there is a very basic auth and CSRF protection (is disabled)
+~~* currently, there is a very basic auth and CSRF protection (is disabled)~~
+* authentication has been added, `/api/movies` now is the way to access data, if not Basic Auth is passed you get back a unauthorized (added on 10 Jul)
 * there is only configuration for using h2 -> console is enabled
 * integration test -> there is one added on 4 Jul
 * not optimized

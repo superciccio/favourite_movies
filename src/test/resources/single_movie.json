@@ -7,16 +7,16 @@
   ],
   "_links": {
     "filterByGenre": {
-      "href": "http://localhost/movies/filter/Fantasy"
+      "href": "http://localhost/api/movies/filter/Fantasy"
     },
     "byId": {
-      "href": "http://localhost/movies/1"
+      "href": "http://localhost/api/movies/1"
     },
     "as_favourite": {
-      "href": "http://localhost/movies/asFavourite/1"
+      "href": "http://localhost/api/movies/asFavourite/1"
     },
     "remove_from_favourites": {
-      "href": "http://localhost/movies/removeAsFavourite/1"
+      "href": "http://localhost/api/movies/removeAsFavourite/1"
     }
   }
 }
